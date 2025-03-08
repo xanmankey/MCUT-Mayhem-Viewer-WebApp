@@ -28,8 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <Route path="/answered" element={<ViewerAnswered />} />
           <Route path="/answer" element={<ViewerAnswer />} />
         </Routes>
-        {/* Load the viewer leaderboard by default */}
-        <ViewerLeaderboard />
       </Router>
     </SocketProvider>
   );
