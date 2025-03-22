@@ -90,6 +90,8 @@ function ViewerLeaderboard() {
                 console.log("User account created successfully");
                 setUsername(username);
                 navigate("/");
+                // Technically, shouldn't need to refresh the page, but doing it anyway
+                navigate(0);
               } else {
                 console.error(
                   "Error creating user account:",
