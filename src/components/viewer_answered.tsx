@@ -14,10 +14,22 @@ function ViewerAnswered() {
     socket.on("results", () => {
       navigate("/answer", {
         state: {
-          correct: question.answer
-            .toLowerCase()
-            .split(",")
-            .includes(response.toLowerCase()),
+          correct:
+            question.question_type === "numbers"
+              ? Math.max(
+                  0,
+                  Math.floor(
+                    1 -
+                      (Math.abs(Number(response) - Number(question.answer)) /
+                        Number(question.answer)) *
+                        15 *
+                        Math.abs(question.weight)
+                  )
+                )
+              : question.answer
+                  .toLowerCase()
+                  .split(",")
+                  .includes(response.toLowerCase()),
         },
       });
       // navigate(0);
