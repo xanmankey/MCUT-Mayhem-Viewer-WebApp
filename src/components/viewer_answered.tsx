@@ -25,7 +25,7 @@ function ViewerAnswered() {
                         15 *
                         Math.abs(question.weight)
                   )
-                )
+                ) > 0
               : question.answer
                   .toLowerCase()
                   .split(",")
