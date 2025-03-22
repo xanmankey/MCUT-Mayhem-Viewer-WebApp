@@ -22,7 +22,7 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
         }}
       />
       <button
-        className="bg-blue-500 text-white px-4 py-2 mt-4"
+        className="bg-blue-500 text-white font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center"
         onClick={() => sendResponse(answer)}
       >
         Submit

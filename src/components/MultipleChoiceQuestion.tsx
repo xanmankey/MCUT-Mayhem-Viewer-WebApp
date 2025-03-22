@@ -16,7 +16,7 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
             style={{ backgroundColor: colors[index % 4] }}
             onClick={() => sendResponse(choice)}
           >
-            <p className="font-bold text-4xl text-center break-words">
+            <p className="font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center">
               {choice}
             </p>
           </button>

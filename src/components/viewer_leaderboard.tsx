@@ -61,10 +61,10 @@ function ViewerLeaderboard() {
             key={player.username}
             className="bg-white shadow-md rounded-lg p-4 mb-4 flex items-center justify-between w-full"
           >
-            <p className="font-bold text-black">
+            <p className="font-bold text-black relative z-10">
               {index + 1}. {player.username}
             </p>
-            <p className="font-bold text-black">{player.score}</p>
+            <p className="font-bold text-black relative z-10">{player.score}</p>
           </div>
         ))}
       </div>

@@ -18,7 +18,7 @@ function NumberQuestion({ question, sendResponse }: QuestionProps) {
         onChange={(e) => setNumber(e.target.value.replace(/[^0-9]/g, ""))}
       />
       <button
-        className="bg-green-500 text-white px-4 py-2 mt-4"
+        className="bg-green-500 text-white font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center"
         onClick={() => sendResponse(number)}
       >
         Submit
