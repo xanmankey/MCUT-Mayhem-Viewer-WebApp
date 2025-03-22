@@ -7,7 +7,7 @@ function NumberQuestion({ question, sendResponse }: QuestionProps) {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen w-screen">
-      <h1 className="text-4xl font-bold mb-4 text-center">
+      <h1 className="text-4xl font-bold mb-4 text-center break-words">
         {question.question}
       </h1>
       <input

@@ -12,11 +12,13 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
         {question.choices.split(",").map((choice, index) => (
           <button
             key={index}
-            className={` text-white h-full w-full flex items-center justify-center p-4`}
+            className={`text-white h-full w-full flex items-center justify-center p-4`}
             style={{ backgroundColor: colors[index % 4] }}
             onClick={() => sendResponse(choice)}
           >
-            <p className="font-bold text-4xl">{choice}</p>
+            <p className="font-bold text-4xl text-center break-words">
+              {choice}
+            </p>
           </button>
         ))}
       </div>
