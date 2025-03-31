@@ -44,29 +44,51 @@ function ViewerLeaderboard() {
   );
 
   return userState.username != "" ? (
-    <div
-      className="flex flex-col items-center justify-center h-screen w-screen"
-      key={location.key}
-    >
-      <input
-        type="text"
-        placeholder="Search by username"
-        className="w-64 px-4 py-2 mb-4 rounded-full border border-gray-300 focus:outline-none"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <div className="overflow-y-auto w-64">
-        {filteredLeaderboard.map((player, index) => (
-          <div
-            key={player.username}
-            className="bg-white shadow-md rounded-lg p-4 mb-4 flex items-center justify-between w-full"
-          >
-            <p className="font-bold text-black relative z-10">
-              {index + 1}. {player.username}
-            </p>
-            <p className="font-bold text-black relative z-10">{player.score}</p>
-          </div>
-        ))}
+    <div>
+      <nav
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "20px",
+          position: "fixed",
+          top: 0,
+          width: "100%",
+          backgroundColor: "white",
+          zIndex: 1000,
+          padding: "10px 0",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <h1 style={{ fontSize: "2rem", fontWeight: "bold", color: "black" }}>
+          {userState.username}
+        </h1>
+      </nav>
+      <div
+        className="flex flex-col items-center justify-center h-screen w-screen"
+        key={location.key}
+      >
+        <input
+          type="text"
+          placeholder="Search by username"
+          className="w-64 px-4 py-2 mb-4 rounded-full border border-gray-300 focus:outline-none"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <div className="overflow-y-auto w-64">
+          {filteredLeaderboard.map((player, index) => (
+            <div
+              key={player.username}
+              className="bg-white shadow-md rounded-lg p-4 mb-4 flex items-center justify-between w-full"
+            >
+              <p className="font-bold text-black relative z-10">
+                {index + 1}. {player.username}
+              </p>
+              <p className="font-bold text-black relative z-10">
+                {player.score}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   ) : (
