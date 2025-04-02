@@ -5,7 +5,7 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen w-screen">
-      <h1 className="text-4xl font-bold mb-4 text-center">
+      <h1 className="text-4xl text-black font-bold mb-4 text-center">
         {question.question}
       </h1>
       <div className="grid grid-cols-2 gap-4 w-full h-full">
