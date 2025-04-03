@@ -12,7 +12,7 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
       </h1>
       <input
         type="text"
-        className="border p-2"
+        className="border-4 border-solid p-2"
         placeholder="Type your answer..."
         value={answer}
         onChange={(e) => {

@@ -12,7 +12,7 @@ function NumberQuestion({ question, sendResponse }: QuestionProps) {
       </h1>
       <input
         type="number"
-        className="border p-2"
+        className="border-4 border-solid p-2"
         placeholder="Enter a number..."
         value={number}
         onChange={(e) => setNumber(e.target.value.replace(/[^0-9]/g, ""))}
