@@ -20,7 +20,8 @@ function ViewerAnswered() {
                   0,
                   Math.floor(
                     1 -
-                      Math.abs(Number(question.answer) - Number(response)) *
+                      (Math.abs(Number(question.answer) - Number(response)) /
+                        Number(question.answer)) *
                         15 *
                         Math.abs(question.weight)
                   )
