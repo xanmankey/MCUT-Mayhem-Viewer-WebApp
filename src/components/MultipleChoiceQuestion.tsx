@@ -4,7 +4,7 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
   const colors = ["#39FF14", "#FF073A", "#0FF0FC", "#BC13FE"];
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen">
+    <div className="flex flex-col items-center justify-center h-screen w-screen bg-white">
       <h1 className="text-4xl text-black font-bold mb-4 text-center">
         {question.question}
       </h1>
