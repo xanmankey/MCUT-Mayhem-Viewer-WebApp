@@ -9,6 +9,7 @@ import ShortAnswerQuestion from "./ShortAnswerQuestion.tsx";
 import NumberQuestion from "./NumberQuestion.tsx";
 
 import { userState } from "../utils.tsx";
+import DropdownQuestion from "./DropdownQuestion.tsx";
 
 // Three different question types
 // 1. Multiple choice
@@ -79,6 +80,8 @@ function ViewerQuestion() {
           <NumberQuestion question={question} sendResponse={sendResponse} />
         ) : question.question_type === "ranked_answer" ? (
           <ShortAnswerQuestion question={question} sendResponse={sendResponse} />
+        ) : question.question_type === "dropdown" ? (
+          <DropdownQuestion question={question} sendResponse={sendResponse} />
         ) : (
           <p className="text-2xl font-bold">Unknown question type</p>
         )
