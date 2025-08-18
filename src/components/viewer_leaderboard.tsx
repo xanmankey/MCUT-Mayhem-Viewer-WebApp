@@ -83,19 +83,14 @@ function ViewerLeaderboard() {
               <p className="font-bold text-black relative z-10">
                 {index + 1}. {player.username}
               </p>
-              <p className="font-bold text-black relative z-10">
-                {player.score}
-              </p>
+              <p className="font-bold text-black relative z-10">{player.score}</p>
             </div>
           ))}
         </div>
       </div>
     </div>
   ) : (
-    <div
-      className="flex flex-col items-center justify-center h-screen w-screen"
-      key={location.key}
-    >
+    <div className="flex flex-col items-center justify-center h-screen w-screen" key={location.key}>
       <p className="text-4xl font-bold py-2">Your first question</p>
       <form
         onSubmit={(e) => {
@@ -115,10 +110,7 @@ function ViewerLeaderboard() {
                 // Technically, shouldn't need to refresh the page, but doing it anyway
                 navigate(0);
               } else {
-                console.error(
-                  "Error creating user account:",
-                  response.statusText
-                );
+                console.error("Error creating user account:", response.statusText);
               }
             })
             .catch((err) => {
@@ -130,15 +122,12 @@ function ViewerLeaderboard() {
         <input
           type="text"
           name="username"
-          placeholder="Enter a UNIQUE username"
+          placeholder="Enter a UNIQUE username (at least 6 characters)"
           className="w-full px-4 py-2 mb-4 rounded-full border border-gray-300 focus:outline-none"
           minLength={6}
           required
         />
-        <button
-          type="submit"
-          className="w-full px-4 py-2 bg-blue-500 text-white rounded-full"
-        >
+        <button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white rounded-full">
           Submit
         </button>
       </form>

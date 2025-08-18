@@ -68,24 +68,17 @@ function ViewerQuestion() {
   }, [navigate]);
 
   return (
-    <div
-      className="flex flex-col items-center justify-center h-screen w-screen"
-      key={location.key}
-    >
+    <div className="flex flex-col items-center justify-center h-screen w-screen" key={location.key}>
       {question ? (
         question.question_type === "multiple_choice" ||
         question.question_type === "this_or_that" ? (
-          <MultipleChoiceQuestion
-            question={question}
-            sendResponse={sendResponse}
-          />
+          <MultipleChoiceQuestion question={question} sendResponse={sendResponse} />
         ) : question.question_type === "short_answer" ? (
-          <ShortAnswerQuestion
-            question={question}
-            sendResponse={sendResponse}
-          />
+          <ShortAnswerQuestion question={question} sendResponse={sendResponse} />
         ) : question.question_type === "numbers" ? (
           <NumberQuestion question={question} sendResponse={sendResponse} />
+        ) : question.question_type === "ranked_answer" ? (
+          <ShortAnswerQuestion question={question} sendResponse={sendResponse} />
         ) : (
           <p className="text-2xl font-bold">Unknown question type</p>
         )
