@@ -83,7 +83,7 @@ function ViewerQuestion() {
         ) : question.question_type === "dropdown" ? (
           <DropdownQuestion question={question} sendResponse={sendResponse} />
         ) : (
-          <p className="text-2xl font-bold">Unknown question type</p>
+          <p className="text-2xl font-bold">Unknown question type: {question.question_type}</p>
         )
       ) : (
         <p className="text-2xl font-bold">Waiting for a question...</p>
