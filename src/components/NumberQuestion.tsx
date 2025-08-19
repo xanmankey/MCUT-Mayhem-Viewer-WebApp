@@ -15,7 +15,7 @@ function NumberQuestion({ question, sendResponse }: QuestionProps) {
         <input
           type="number"
           className="border-4 border-solid border-black text-black p-2"
-          placeholder="Enter a number..."
+          placeholder={question.question}
           value={number}
           onChange={(e) => setNumber(e.target.value.replace(/[^0-9]/g, ""))}
         />

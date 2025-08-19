@@ -12,10 +12,9 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
         {/* <h1 className="text-4xl text-black font-bold mb-4 text-center break-words">
           {question.question}
         </h1> */}
-        <input
-          type="text"
-          className="border-4 border-solid border-black text-black p-2"
-          placeholder="Type your answer..."
+        <textarea
+          className="border-4 border-solid border-black text-black p-2 w-full h-40 resize-none"
+          placeholder={question.question}
           value={answer}
           onChange={(e) => {
             if (e.target.value.length <= 200) {
