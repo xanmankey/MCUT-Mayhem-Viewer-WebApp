@@ -8,7 +8,7 @@ function DropdownQuestion({ question, sendResponse }: QuestionProps) {
     <div>
       <div className="m-1"></div>
       <div className="overflow-y-auto">
-        <h1 className="text-9xl text-black text-center font-bold mb-4">{question.question}</h1>
+        {/* <h1 className="text-9xl text-black text-center font-bold mb-4">{question.question}</h1> */}
         {/* {question.image_url && (
           <div className="flex justify-center mb-4">
             <img src={question.image_url} alt="Question related" className="w-160 h-auto" />

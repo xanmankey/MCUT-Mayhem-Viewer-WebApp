@@ -7,7 +7,7 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
     <div>
       <div className="m-1"></div>
       <div className="overflow-y-auto flex flex-col items-center justify-center h-screen w-screen bg-white">
-        <h1 className="text-4xl text-black font-bold mb-4 text-center">{question.question}</h1>
+        {/* <h1 className="text-4xl text-black font-bold mb-4 text-center">{question.question}</h1> */}
         <div className="grid grid-cols-2 gap-4 w-full h-full">
           {question.choices.split(",").map((choice, index) => (
             <button

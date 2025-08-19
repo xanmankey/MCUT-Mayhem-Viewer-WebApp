@@ -9,9 +9,9 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
     <div>
       <div className="m-1"></div>
       <div className="overflow-y-auto flex flex-col items-center justify-center h-screen w-screen bg-white">
-        <h1 className="text-4xl text-black font-bold mb-4 text-center break-words">
+        {/* <h1 className="text-4xl text-black font-bold mb-4 text-center break-words">
           {question.question}
-        </h1>
+        </h1> */}
         <input
           type="text"
           className="border-4 border-solid border-black text-black p-2"
