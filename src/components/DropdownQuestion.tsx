@@ -14,7 +14,7 @@ function DropdownQuestion({ question, sendResponse }: QuestionProps) {
             <img src={question.image_url} alt="Question related" className="w-160 h-auto" />
           </div>
         )} */}
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2 items-center justify-center max-w-[620px]">
+        <div className="w-full grid grid-cols-2 sm:grid-cols-2 gap-2 items-center justify-center max-w-[620px]">
           {question.choices.split(",").map((choice, index) => (
             <button
               key={index}
