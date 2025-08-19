@@ -4,10 +4,8 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
   const colors = ["#39FF14", "#FF073A", "#0FF0FC", "#BC13FE"];
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen bg-white">
-      <h1 className="text-4xl text-black font-bold mb-4 text-center">
-        {question.question}
-      </h1>
+    <div className="overflow-y-auto flex flex-col items-center justify-center h-screen w-screen bg-white">
+      <h1 className="text-4xl text-black font-bold mb-4 text-center">{question.question}</h1>
       <div className="grid grid-cols-2 gap-4 w-full h-full">
         {question.choices.split(",").map((choice, index) => (
           <button
