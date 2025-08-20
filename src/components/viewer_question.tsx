@@ -22,7 +22,7 @@ import DropdownQuestion from "./DropdownQuestion.tsx";
 function ViewerQuestion() {
   const navigate = useNavigate();
   const location = useLocation();
-  const question = JSON.parse(location.state?.question.question.question);
+  const question = JSON.parse(location.state?.question.question);
 
   // Send the response to the server
   const sendResponse = (response: string) => {
