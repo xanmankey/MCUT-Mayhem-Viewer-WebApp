@@ -92,6 +92,7 @@ function ViewerLeaderboard() {
   ) : (
     <div className="flex flex-col items-center justify-center h-screen w-screen" key={location.key}>
       <p className="text-4xl font-bold py-2">Your first question</p>
+      <p className="text-2xl font-bold py-2 bg-red-600" id="warning"></p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -110,9 +111,9 @@ function ViewerLeaderboard() {
                 // Technically, shouldn't need to refresh the page, but doing it anyway
                 navigate(0);
               } else {
-                response.text().then((warning) => {
-                  alert(warning);
-                });
+                // Handle error response
+                let warning = document.getElementById("warning");
+                warning!.innerText = response.statusText;
                 console.error("Error creating user account:", response.statusText);
               }
             })
