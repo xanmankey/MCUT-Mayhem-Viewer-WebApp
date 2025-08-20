@@ -110,6 +110,9 @@ function ViewerLeaderboard() {
                 // Technically, shouldn't need to refresh the page, but doing it anyway
                 navigate(0);
               } else {
+                response.text().then((warning) => {
+                  alert(warning);
+                });
                 console.error("Error creating user account:", response.statusText);
               }
             })
