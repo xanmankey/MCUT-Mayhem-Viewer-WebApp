@@ -40,6 +40,30 @@ function ViewerLeaderboard() {
       });
   }, []);
 
+  useEffect(() => {
+    socket.on("check_answered", () => {
+      // Send the current username to the server to check if they have answered
+      if (userState.username != "") {
+        socket.emit("check_answered_response", { username: userState.username });
+      }
+    });
+
+    return () => {
+      socket.off("check_answered");
+    }; // Cleanup on unmount (does this mean it will only run once?)
+  }, []); // Runs once and listens for new questions
+
+  useEffect(() => {
+    socket.on("already_answered", () => {
+      // Redirect to answered page
+      navigate("/answered", { state: { response: "", question: null } });
+    });
+
+    return () => {
+      socket.off("check_answered");
+    }; // Cleanup on unmount (does this mean it will only run once?)
+  }, []); // Runs once and listens for new questions
+
   const filteredLeaderboard = leaderboard.filter((player) =>
     player.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
