@@ -1,7 +1,7 @@
 import { QuestionProps } from "../interfaces/QuestionProps";
 
 function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
-  const colors = ["#F5B73C", "#D1ED2A", "#0FF0FC", "#BC13FE"];
+  const colors = ["#2AE4E0", "#BC13FE", "#E09B2A", "#A3E02A"];
 
   return (
     <div>
