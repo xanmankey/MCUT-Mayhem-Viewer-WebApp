@@ -44,6 +44,7 @@ function ViewerLeaderboard() {
     socket.on("check_answered", () => {
       // Send the current username to the server to check if they have answered
       if (userState.username != "") {
+        console.log("Checking if user has answered");
         socket.emit("check_answered_response", { username: userState.username });
       }
     });
@@ -56,6 +57,7 @@ function ViewerLeaderboard() {
   useEffect(() => {
     socket.on("already_answered", () => {
       // Redirect to answered page
+      console.log("User has already answered the question");
       navigate("/answered", { state: { response: "", question: null } });
     });
 
