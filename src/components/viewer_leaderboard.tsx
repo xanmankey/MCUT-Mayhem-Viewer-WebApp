@@ -14,6 +14,7 @@ function ViewerLeaderboard() {
   const navigate = useNavigate();
   const [leaderboard, setLeaderboard] = useState<Player[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [warning, setWarning] = useState("");
   const location = useLocation();
 
   // Listen for new questions via WebSocket
@@ -92,7 +93,7 @@ function ViewerLeaderboard() {
   ) : (
     <div className="flex flex-col items-center justify-center h-screen w-screen" key={location.key}>
       <p className="text-4xl font-bold py-2">Your first question</p>
-      <p className="text-2xl font-bold py-2 bg-red-600" id="warning"></p>
+      {warning && <p className="text-2xl font-bold py-2 bg-red-600">{warning}</p>}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -103,7 +104,7 @@ function ViewerLeaderboard() {
             method: "POST",
             body: formData,
           })
-            .then((response) => {
+            .then(async (response) => {
               if (response.ok) {
                 console.log("User account created successfully");
                 setUsername(username);
@@ -112,12 +113,13 @@ function ViewerLeaderboard() {
                 navigate(0);
               } else {
                 // Handle error response
-                let warning = document.getElementById("warning");
-                warning!.innerText = response.statusText;
+                const errorData = await response.json();
+                setWarning(errorData.message || response.statusText);
                 console.error("Error creating user account:", response.statusText);
               }
             })
             .catch((err) => {
+              setWarning("Error sending data to backend");
               console.error("Error sending data to backend:", err);
             });
         }}
