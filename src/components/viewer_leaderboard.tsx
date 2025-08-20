@@ -107,7 +107,7 @@ function ViewerLeaderboard() {
               key={player.username}
               className="bg-white shadow-md rounded-lg p-4 mb-4 flex items-center justify-between w-full"
             >
-              <p className="font-bold text-black relative z-10">
+              <p className="font-bold text-black relative z-10" id={player.username}>
                 {index + 1}. {player.username}
               </p>
               <p className="font-bold text-black relative z-10">{player.score}</p>
@@ -119,7 +119,11 @@ function ViewerLeaderboard() {
   ) : (
     <div className="flex flex-col items-center justify-center h-screen w-screen" key={location.key}>
       <p className="text-4xl font-bold py-2">Your first question</p>
-      {warning && <p className="text-2xl font-bold py-2 text-red-600">{warning}</p>}
+      {warning && (
+        <p className="text-2xl font-bold py-2 text-red-600" id="warning">
+          {warning}
+        </p>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -153,11 +157,16 @@ function ViewerLeaderboard() {
       >
         <input
           type="text"
+          id="username"
           name="username"
           placeholder="Enter a UNIQUE username"
           className="w-full px-4 py-2 mb-4 rounded-full border border-gray-300 focus:outline-none"
         />
-        <button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white rounded-full">
+        <button
+          type="submit"
+          className="w-full px-4 py-2 bg-blue-500 text-white rounded-full"
+          id="login"
+        >
           Submit
         </button>
       </form>
