@@ -26,10 +26,7 @@ function ViewerAnswered() {
                       Math.abs(question.weight)
                   )
                 ) > 0
-              : question.answer
-                  .toLowerCase()
-                  .split(",")
-                  .includes(response.toLowerCase()),
+              : question.answer.toLowerCase().split(",").includes(response.toLowerCase()),
         },
       });
       // navigate(0);
@@ -44,6 +41,7 @@ function ViewerAnswered() {
     <div
       className="bg-gray-200 h-screen w-screen flex flex-col items-center justify-center"
       key={location.key}
+      style={{ zIndex: 20000, position: "fixed", top: 0, left: 0 }}
     >
       <h1 className="text-black text-2xl font-bold mb-4">Good answer?</h1>
       <div className="w-12 h-12 border-4 border-t-4 border-t-purple-500 border-purple-300 rounded-full mt-4 animate-spin"></div>

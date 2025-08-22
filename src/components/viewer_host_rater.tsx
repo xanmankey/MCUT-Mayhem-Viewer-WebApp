@@ -67,6 +67,44 @@ function ViewerHostRater() {
   }, []); // Runs once and listens for new questions
 
   useEffect(() => {
+    // If the host is changed, fetch the new review state
+    socket.on("host_changed", () => {
+      const fetchCurrentReview = async () => {
+        if (userState.username) {
+          try {
+            await fetch(BACKEND + "/current_review", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ username: userState.username }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                setReview(data.review);
+                console.log("Current review data:", data);
+                hostUsername = data.review.host_username;
+                setCharisma(data.review.charisma_rating ?? "0");
+                setChallengePerformance(data.review.challenge_performance_rating ?? "0");
+                setAudienceInteraction(data.review.audience_interaction_rating ?? "0");
+                setFlow(data.review.flow_rating ?? "0");
+                setOther(data.review.other_rating ?? "0");
+                setTextReview(data.review.review ?? "");
+              });
+          } catch (err) {
+            console.error("Error fetching current review:", err);
+          }
+        }
+      };
+      fetchCurrentReview();
+    });
+
+    return () => {
+      socket.off("host_changed");
+    }; // Cleanup on unmount
+  }, [socket]);
+
+  useEffect(() => {
     const fetchCurrentReview = async () => {
       if (userState.username) {
         try {
@@ -80,6 +118,7 @@ function ViewerHostRater() {
             .then((response) => response.json())
             .then((data) => {
               setReview(data.review);
+              console.log("Current review data:", data);
               hostUsername = data.review.host_username;
               setCharisma(data.review.charisma_rating ?? "0");
               setChallengePerformance(data.review.challenge_performance_rating ?? "0");
@@ -87,7 +126,6 @@ function ViewerHostRater() {
               setFlow(data.review.flow_rating ?? "0");
               setOther(data.review.other_rating ?? "0");
               setTextReview(data.review.review ?? "");
-              console.log("Current review:", data);
             });
         } catch (err) {
           console.error("Error fetching current review:", err);

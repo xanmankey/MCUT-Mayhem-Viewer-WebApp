@@ -69,7 +69,11 @@ function ViewerQuestion() {
   }, [navigate]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen" key={location.key}>
+    <div
+      className="flex flex-col items-center justify-center h-screen w-screen"
+      key={location.key}
+      style={{ zIndex: 20000, position: "fixed", top: 0, left: 0 }}
+    >
       {question ? (
         question.question_type === "multiple_choice" ||
         question.question_type === "this_or_that" ? (
