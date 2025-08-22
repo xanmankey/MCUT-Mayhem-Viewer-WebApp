@@ -13,6 +13,8 @@ function ViewerHostRater() {
   const socket = useContext(SocketContext);
   const [review, setReview] = useState<HostReview | null>(null);
   const [textReview, setTextReview] = useState("");
+  let lastReviewTime;
+  const [textReviewPending, setTextReviewPending] = useState("");
   const [charisma, setCharisma] = useState("0");
   const [pendingCharisma, setPendingCharisma] = useState("0");
   const [challengePerformance, setChallengePerformance] = useState("0");
@@ -91,75 +93,63 @@ function ViewerHostRater() {
 
   const handleSetCharisma = () => {
     setCharisma(pendingCharisma);
-    const formData = new FormData();
-    formData.append("username", userState.username);
-    formData.append("host_username", hostUsername);
-    formData.append("charisma_rating", charisma);
 
-    fetch(BACKEND + "/update_review", {
-      method: "POST",
-      body: formData,
-    }).catch((err) => {
-      console.error("Error updating charisma review:", err);
+    socket.emit("update_review", {
+      username: userState.username,
+      host_username: hostUsername,
+      charisma_rating: charisma,
     });
   };
 
   const handleSetChallengePerformance = () => {
     setChallengePerformance(pendingChallengePerformance);
-    const formData = new FormData();
-    formData.append("username", userState.username);
-    formData.append("host_username", hostUsername);
-    formData.append("challenge_performance_rating", challengePerformance);
-    fetch(BACKEND + "/update_review", {
-      method: "POST",
-      body: formData,
-    }).catch((err) => {
-      console.error("Error updating challenge performance review:", err);
+
+    socket.emit("update_review", {
+      username: userState.username,
+      host_username: hostUsername,
+      challenge_performance_rating: challengePerformance,
     });
   };
 
   const handleSetAudienceInteraction = () => {
     // If you want to use a pending value, add a pendingAudienceInteraction state and use it here
     setAudienceInteraction(audienceInteraction);
-    const formData = new FormData();
-    formData.append("username", userState.username);
-    formData.append("host_username", hostUsername);
-    formData.append("audience_interaction_rating", audienceInteraction);
-    fetch(BACKEND + "/update_review", {
-      method: "POST",
-      body: formData,
-    }).catch((err) => {
-      console.error("Error updating audience interaction review:", err);
+
+    socket.emit("update_review", {
+      username: userState.username,
+      host_username: hostUsername,
+      audience_interaction_rating: audienceInteraction,
     });
   };
 
   const handleSetFlow = () => {
     // If you want to use a pending value, add a pendingFlow state and use it here
     setFlow(flow);
-    const formData = new FormData();
-    formData.append("username", userState.username);
-    formData.append("host_username", hostUsername);
-    formData.append("flow_rating", audienceInteraction);
-    fetch(BACKEND + "/update_review", {
-      method: "POST",
-      body: formData,
-    }).catch((err) => {
-      console.error("Error updating flow review:", err);
+
+    socket.emit("update_review", {
+      username: userState.username,
+      host_username: hostUsername,
+      flow_rating: flow,
     });
   };
 
   const handleSetOther = () => {
     // If you want to use a pending value, add a pendingOther state and use it here
     setOther(other);
-    const formData = new FormData();
-    formData.append("username", userState.username);
-    formData.append("host_username", hostUsername);
-    formData.append("other_rating", other);
-    fetch(BACKEND + "/update_review", {
-      method: "POST",
-      body: formData
-    }).catch((err) => {
-      console.error("Error updating other review:", err);
+
+    socket.emit("update_review", {
+      username: userState.username,
+      host_username: hostUsername,
+      other_rating: other,
+    });
+  };
+
+  const handleTextReview = () => {
+    setTextReview(textReviewPending);
+    socket.emit("update_review", {
+      username: userState.username,
+      host_username: hostUsername,
+      review: textReview,
     });
   };
 
@@ -276,11 +266,19 @@ function ViewerHostRater() {
           <textarea
             className="border-4 border-solid border-black text-black p-2 w-2/3 resize-none"
             placeholder=""
-            value={textReview}
+            value={textReviewPending}
             rows={5}
             onChange={(e) => {
+              const newReviewTime = Date.now();
               if (e.target.value.length <= 500) {
-                setTextReview(e.target.value);
+                setTextReviewPending(e.target.value);
+              } else {
+                return;
+              }
+              // Check if the time of the previous input was more than 1 second ago
+              lastReviewTime = newReviewTime;
+              if (newReviewTime - lastReviewTime > 2000) {
+                handleTextReview();
               }
             }}
           />
