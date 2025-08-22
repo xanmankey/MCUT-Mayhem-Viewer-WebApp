@@ -18,6 +18,7 @@ function MultipleChoiceQuestion({ question, sendResponse }: QuestionProps) {
               <button
                 key={index}
                 className="text-white h-full w-full flex items-center justify-center p-4 transition-transform duration-200 hover:scale-105"
+                id={choice}
                 style={{
                   background: gradient,
                   border: "none",
