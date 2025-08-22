@@ -94,63 +94,81 @@ function ViewerHostRater() {
   const handleSetCharisma = () => {
     setCharisma(pendingCharisma);
 
-    socket.emit("update_review", {
-      username: userState.username,
-      host_username: hostUsername,
-      charisma_rating: charisma,
-    });
+    socket.emit(
+      "update_review",
+      JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        charisma_rating: charisma,
+      })
+    );
   };
 
   const handleSetChallengePerformance = () => {
     setChallengePerformance(pendingChallengePerformance);
 
-    socket.emit("update_review", {
-      username: userState.username,
-      host_username: hostUsername,
-      challenge_performance_rating: challengePerformance,
-    });
+    socket.emit(
+      "update_review",
+      JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        challenge_performance_rating: challengePerformance,
+      })
+    );
   };
 
   const handleSetAudienceInteraction = () => {
     // If you want to use a pending value, add a pendingAudienceInteraction state and use it here
     setAudienceInteraction(audienceInteraction);
 
-    socket.emit("update_review", {
-      username: userState.username,
-      host_username: hostUsername,
-      audience_interaction_rating: audienceInteraction,
-    });
+    socket.emit(
+      "update_review",
+      JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        audience_interaction_rating: audienceInteraction,
+      })
+    );
   };
 
   const handleSetFlow = () => {
     // If you want to use a pending value, add a pendingFlow state and use it here
     setFlow(flow);
 
-    socket.emit("update_review", {
-      username: userState.username,
-      host_username: hostUsername,
-      flow_rating: flow,
-    });
+    socket.emit(
+      "update_review",
+      JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        flow_rating: flow,
+      })
+    );
   };
 
   const handleSetOther = () => {
     // If you want to use a pending value, add a pendingOther state and use it here
     setOther(other);
 
-    socket.emit("update_review", {
-      username: userState.username,
-      host_username: hostUsername,
-      other_rating: other,
-    });
+    socket.emit(
+      "update_review",
+      JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        other_rating: other,
+      })
+    );
   };
 
   const handleTextReview = () => {
     setTextReview(textReviewPending);
-    socket.emit("update_review", {
-      username: userState.username,
-      host_username: hostUsername,
-      review: textReview,
-    });
+    socket.emit(
+      "update_review",
+      JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        review: textReview,
+      })
+    );
   };
 
   return (
