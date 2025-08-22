@@ -91,16 +91,14 @@ function ViewerHostRater() {
 
   const handleSetCharisma = () => {
     setCharisma(pendingCharisma);
+    const formData = new FormData();
+    formData.append("username", userState.username);
+    formData.append("host_username", hostUsername);
+    formData.append("charisma_rating", charisma);
+
     fetch(BACKEND + "/update_review", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: userState.username,
-        host_username: hostUsername,
-        charisma_rating: charisma,
-      }),
+      body: formData,
     }).catch((err) => {
       console.error("Error updating charisma review:", err);
     });
@@ -108,16 +106,13 @@ function ViewerHostRater() {
 
   const handleSetChallengePerformance = () => {
     setChallengePerformance(pendingChallengePerformance);
+    const formData = new FormData();
+    formData.append("username", userState.username);
+    formData.append("host_username", hostUsername);
+    formData.append("challenge_performance_rating", challengePerformance);
     fetch(BACKEND + "/update_review", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: userState.username,
-        host_username: hostUsername,
-        challenge_performance_rating: challengePerformance,
-      }),
+      body: formData,
     }).catch((err) => {
       console.error("Error updating challenge performance review:", err);
     });
@@ -126,16 +121,13 @@ function ViewerHostRater() {
   const handleSetAudienceInteraction = () => {
     // If you want to use a pending value, add a pendingAudienceInteraction state and use it here
     setAudienceInteraction(audienceInteraction);
+    const formData = new FormData();
+    formData.append("username", userState.username);
+    formData.append("host_username", hostUsername);
+    formData.append("audience_interaction_rating", audienceInteraction);
     fetch(BACKEND + "/update_review", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: userState.username,
-        host_username: hostUsername,
-        audience_interaction_rating: audienceInteraction,
-      }),
+      body: formData,
     }).catch((err) => {
       console.error("Error updating audience interaction review:", err);
     });
@@ -144,16 +136,13 @@ function ViewerHostRater() {
   const handleSetFlow = () => {
     // If you want to use a pending value, add a pendingFlow state and use it here
     setFlow(flow);
+    const formData = new FormData();
+    formData.append("username", userState.username);
+    formData.append("host_username", hostUsername);
+    formData.append("flow_rating", audienceInteraction);
     fetch(BACKEND + "/update_review", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: userState.username,
-        host_username: hostUsername,
-        flow_rating: flow,
-      }),
+      body: formData,
     }).catch((err) => {
       console.error("Error updating flow review:", err);
     });
@@ -162,16 +151,13 @@ function ViewerHostRater() {
   const handleSetOther = () => {
     // If you want to use a pending value, add a pendingOther state and use it here
     setOther(other);
+    const formData = new FormData();
+    formData.append("username", userState.username);
+    formData.append("host_username", hostUsername);
+    formData.append("other_rating", other);
     fetch(BACKEND + "/update_review", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: userState.username,
-        host_username: hostUsername,
-        other_rating: other,
-      }),
+      body: formData
     }).catch((err) => {
       console.error("Error updating other review:", err);
     });
