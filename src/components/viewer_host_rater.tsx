@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
-import { userState, setUsername, BACKEND, SocketContext } from "../utils.tsx";
+import { userState, BACKEND, SocketContext } from "../utils.tsx";
 
 import { HostReview } from "../interfaces/HostReview.tsx";
 
@@ -216,7 +216,9 @@ function ViewerHostRater() {
           />
           <div className="w-2/3 max-w-md space-y-6">
             <div>
-              <label className="block text-lg font-semibold mb-2">Charisma: {charisma}</label>
+              <label className="block text-lg font-semibold mb-2">
+                Charisma: {pendingCharisma}
+              </label>
               <input
                 type="range"
                 min={0}
@@ -235,7 +237,7 @@ function ViewerHostRater() {
             </div>
             <div>
               <label className="block text-lg font-semibold mb-2">
-                Challenge Performance: {challengePerformance}
+                Challenge Performance: {pendingChallengePerformance}
               </label>
               <input
                 type="range"
@@ -243,11 +245,11 @@ function ViewerHostRater() {
                 max={1}
                 step={0.01}
                 id="challenge_performance"
-                value={challengePerformance ?? 0}
+                value={pendingChallengePerformance}
                 className="w-full"
                 onChange={async (e) => {
                   const newValue = e.target.value;
-                  setChallengePerformance(newValue);
+                  setPendingChallengePerformance(newValue);
                 }}
                 onMouseUp={handleSetChallengePerformance}
                 onTouchEnd={handleSetChallengePerformance} // for mobile support
@@ -255,7 +257,7 @@ function ViewerHostRater() {
             </div>
             <div>
               <label className="block text-lg font-semibold mb-2">
-                Audience Interaction: {audienceInteraction}
+                Audience Interaction: {pendingAudienceInteraction}
               </label>
               <input
                 type="range"
@@ -263,47 +265,47 @@ function ViewerHostRater() {
                 max={1}
                 step={0.01}
                 id="audience_interaction"
-                value={audienceInteraction}
+                value={pendingAudienceInteraction}
                 className="w-full"
                 onChange={async (e) => {
                   const newValue = e.target.value;
-                  setAudienceInteraction(newValue);
+                  setPendingAudienceInteraction(newValue);
                 }}
                 onMouseUp={handleSetAudienceInteraction}
                 onTouchEnd={handleSetAudienceInteraction} // for mobile support
               />
             </div>
             <div>
-              <label className="block text-lg font-semibold mb-2">Flow: {flow}</label>
+              <label className="block text-lg font-semibold mb-2">Flow: {pendingFlow}</label>
               <input
                 type="range"
                 min={0}
                 max={1}
                 step={0.01}
                 id="flow"
-                value={flow}
+                value={pendingFlow}
                 className="w-full"
                 onChange={async (e) => {
                   const newValue = e.target.value;
-                  setFlow(newValue);
+                  setPendingFlow(newValue);
                 }}
                 onMouseUp={handleSetFlow}
                 onTouchEnd={handleSetFlow} // for mobile support
               />
             </div>
             <div>
-              <label className="block text-lg font-semibold mb-2">Other: {other}</label>
+              <label className="block text-lg font-semibold mb-2">Other: {pendingOther}</label>
               <input
                 type="range"
                 min={0}
                 max={1}
                 step={0.01}
                 id="other"
-                value={other}
+                value={pendingOther}
                 className="w-full custom-gradient-range"
                 onChange={async (e) => {
                   const newValue = e.target.value;
-                  setOther(newValue);
+                  setPendingOther(newValue);
                 }}
                 onMouseUp={handleSetOther}
                 onTouchEnd={handleSetOther} // for mobile support
