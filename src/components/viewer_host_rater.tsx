@@ -165,15 +165,15 @@ function ViewerHostRater() {
     );
   };
 
-  const handleTextReview = () => {
-    setTextReview(textReview);
-    console.log("setting text review:", textReview);
+  const handleTextReview = (rev: string) => {
+    setTextReview(rev);
+    console.log("setting text review:", rev);
     socket.emit(
       "update_review",
       JSON.stringify({
         username: userState.username,
         host_username: hostUsername,
-        review: textReview,
+        review: rev,
       })
     );
   };
@@ -292,7 +292,7 @@ function ViewerHostRater() {
             value={textReview}
             rows={5}
             onChange={(e) => {
-              if (e.target.value.length <= 500) {
+              if (e.target.value.length <= 2000) {
                 setTextReview(e.target.value);
               }
               // Start a timer (if not already running) to handle text review submission
@@ -301,7 +301,7 @@ function ViewerHostRater() {
                 clearTimeout(window.textReviewTimer);
               }
               window.textReviewTimer = setTimeout(() => {
-                handleTextReview();
+                handleTextReview(e.target.value);
                 window.textReviewTimer = null;
               }, 2000);
             }}

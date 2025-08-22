@@ -132,9 +132,6 @@ function ViewerLeaderboard() {
 
           fetch(BACKEND + "/create_player", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
             body: formData,
           })
             .then(async (response) => {
