@@ -89,117 +89,92 @@ function ViewerHostRater() {
     fetchCurrentReview();
   }, []);
 
-  useEffect(() => {
-    if (userState.username) {
-      fetch(BACKEND + "/update_review", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: userState.username,
-          host_username: hostUsername,
-          charisma_rating: charisma,
-        }),
-      }).catch((err) => {
-        console.error("Error updating charisma review:", err);
-      });
-    }
-  }, [charisma, userState.username]);
-
-  useEffect(() => {
-    if (userState.username) {
-      fetch(BACKEND + "/update_review", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: userState.username,
-          host_username: hostUsername,
-          challenge_performance_rating: challengePerformance,
-        }),
-      }).catch((err) => {
-        console.error("Error updating challenge performance review:", err);
-      });
-    }
-  }, [challengePerformance, userState.username]);
-
-  useEffect(() => {
-    if (userState.username && review) {
-      fetch(BACKEND + "/update_review", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: userState.username,
-          host_username: review.host_username,
-          audience_interaction_rating: audienceInteraction,
-        }),
-      }).catch((err) => {
-        console.error("Error updating audience interaction review:", err);
-      });
-    }
-  }, [audienceInteraction, userState.username, review]);
-
-  useEffect(() => {
-    if (userState.username && review) {
-      fetch(BACKEND + "/update_review", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: userState.username,
-          host_username: review.host_username,
-          flow_rating: flow,
-        }),
-      }).catch((err) => {
-        console.error("Error updating flow review:", err);
-      });
-    }
-  }, [flow, userState.username, review]);
-
-  useEffect(() => {
-    if (userState.username && review) {
-      fetch(BACKEND + "/update_review", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: userState.username,
-          host_username: review.host_username,
-          other_rating: other,
-        }),
-      }).catch((err) => {
-        console.error("Error updating other review:", err);
-      });
-    }
-  }, [other, userState.username, review]);
-
   const handleSetCharisma = () => {
     setCharisma(pendingCharisma);
+    fetch(BACKEND + "/update_review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        charisma_rating: charisma,
+      }),
+    }).catch((err) => {
+      console.error("Error updating charisma review:", err);
+    });
   };
 
   const handleSetChallengePerformance = () => {
     setChallengePerformance(pendingChallengePerformance);
+    fetch(BACKEND + "/update_review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        challenge_performance_rating: challengePerformance,
+      }),
+    }).catch((err) => {
+      console.error("Error updating challenge performance review:", err);
+    });
   };
 
   const handleSetAudienceInteraction = () => {
     // If you want to use a pending value, add a pendingAudienceInteraction state and use it here
     setAudienceInteraction(audienceInteraction);
+    fetch(BACKEND + "/update_review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        audience_interaction_rating: audienceInteraction,
+      }),
+    }).catch((err) => {
+      console.error("Error updating audience interaction review:", err);
+    });
   };
 
   const handleSetFlow = () => {
     // If you want to use a pending value, add a pendingFlow state and use it here
     setFlow(flow);
+    fetch(BACKEND + "/update_review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        flow_rating: flow,
+      }),
+    }).catch((err) => {
+      console.error("Error updating flow review:", err);
+    });
   };
 
   const handleSetOther = () => {
     // If you want to use a pending value, add a pendingOther state and use it here
     setOther(other);
+    fetch(BACKEND + "/update_review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: userState.username,
+        host_username: hostUsername,
+        other_rating: other,
+      }),
+    }).catch((err) => {
+      console.error("Error updating other review:", err);
+    });
   };
 
   return (
