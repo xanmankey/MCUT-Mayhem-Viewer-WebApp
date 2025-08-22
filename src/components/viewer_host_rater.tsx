@@ -5,6 +5,13 @@ import { userState, BACKEND, SocketContext } from "../utils.tsx";
 
 import { HostReview } from "../interfaces/HostReview.tsx";
 
+// Extend the Window interface to include textReviewTimer
+declare global {
+  interface Window {
+    textReviewTimer?: ReturnType<typeof setTimeout> | null;
+  }
+}
+
 let hostUsername: string;
 
 function ViewerHostRater() {
@@ -13,18 +20,11 @@ function ViewerHostRater() {
   const socket = useContext(SocketContext);
   const [review, setReview] = useState<HostReview | null>(null);
   const [textReview, setTextReview] = useState("");
-  let lastReviewTime;
-  const [textReviewPending, setTextReviewPending] = useState("");
   const [charisma, setCharisma] = useState("0");
-  const [pendingCharisma, setPendingCharisma] = useState("0");
   const [challengePerformance, setChallengePerformance] = useState("0");
-  const [pendingChallengePerformance, setPendingChallengePerformance] = useState("0");
   const [audienceInteraction, setAudienceInteraction] = useState("0");
-  const [pendingAudienceInteraction, setPendingAudienceInteraction] = useState("0");
   const [flow, setFlow] = useState("0");
-  const [pendingFlow, setPendingFlow] = useState("0");
   const [other, setOther] = useState("0");
-  const [pendingOther, setPendingOther] = useState("0");
 
   // Listen for new questions via WebSocket
   useEffect(() => {
@@ -81,6 +81,12 @@ function ViewerHostRater() {
             .then((data) => {
               setReview(data.review);
               hostUsername = data.review.host_username;
+              setCharisma(data.review.charisma_rating ?? "0");
+              setChallengePerformance(data.review.challenge_performance_rating ?? "0");
+              setAudienceInteraction(data.review.audience_interaction_rating ?? "0");
+              setFlow(data.review.flow_rating ?? "0");
+              setOther(data.review.other_rating ?? "0");
+              setTextReview(data.review.review ?? "");
               console.log("Current review:", data);
             });
         } catch (err) {
@@ -92,7 +98,7 @@ function ViewerHostRater() {
   }, []);
 
   const handleSetCharisma = () => {
-    setCharisma(pendingCharisma);
+    setCharisma(charisma);
 
     socket.emit(
       "update_review",
@@ -105,7 +111,7 @@ function ViewerHostRater() {
   };
 
   const handleSetChallengePerformance = () => {
-    setChallengePerformance(pendingChallengePerformance);
+    setChallengePerformance(challengePerformance);
 
     socket.emit(
       "update_review",
@@ -160,7 +166,8 @@ function ViewerHostRater() {
   };
 
   const handleTextReview = () => {
-    setTextReview(textReviewPending);
+    setTextReview(textReview);
+    console.log("setting text review:", textReview);
     socket.emit(
       "update_review",
       JSON.stringify({
@@ -185,20 +192,18 @@ function ViewerHostRater() {
           />
           <div className="w-2/3 max-w-md space-y-6">
             <div>
-              <label className="block text-lg font-semibold mb-2">
-                Charisma: {pendingCharisma}
-              </label>
+              <label className="block text-lg font-semibold mb-2">Charisma: {charisma}</label>
               <input
                 type="range"
                 min={0}
                 max={1}
                 step={0.01}
                 id="charisma"
-                value={pendingCharisma}
+                value={charisma}
                 className="w-full"
                 onChange={async (e) => {
                   const newValue = e.target.value;
-                  setPendingCharisma(newValue);
+                  setCharisma(newValue);
                 }}
                 onMouseUp={handleSetCharisma}
                 onTouchEnd={handleSetCharisma} // for mobile support
@@ -206,7 +211,7 @@ function ViewerHostRater() {
             </div>
             <div>
               <label className="block text-lg font-semibold mb-2">
-                Challenge Performance: {pendingChallengePerformance}
+                Challenge Performance: {challengePerformance}
               </label>
               <input
                 type="range"
@@ -214,11 +219,11 @@ function ViewerHostRater() {
                 max={1}
                 step={0.01}
                 id="challenge_performance"
-                value={pendingChallengePerformance}
+                value={challengePerformance}
                 className="w-full"
                 onChange={async (e) => {
                   const newValue = e.target.value;
-                  setPendingChallengePerformance(newValue);
+                  setChallengePerformance(newValue);
                 }}
                 onMouseUp={handleSetChallengePerformance}
                 onTouchEnd={handleSetChallengePerformance} // for mobile support
@@ -226,7 +231,7 @@ function ViewerHostRater() {
             </div>
             <div>
               <label className="block text-lg font-semibold mb-2">
-                Audience Interaction: {pendingAudienceInteraction}
+                Audience Interaction: {audienceInteraction}
               </label>
               <input
                 type="range"
@@ -234,47 +239,47 @@ function ViewerHostRater() {
                 max={1}
                 step={0.01}
                 id="audience_interaction"
-                value={pendingAudienceInteraction}
+                value={audienceInteraction}
                 className="w-full"
                 onChange={async (e) => {
                   const newValue = e.target.value;
-                  setPendingAudienceInteraction(newValue);
+                  setAudienceInteraction(newValue);
                 }}
                 onMouseUp={handleSetAudienceInteraction}
                 onTouchEnd={handleSetAudienceInteraction} // for mobile support
               />
             </div>
             <div>
-              <label className="block text-lg font-semibold mb-2">Flow: {pendingFlow}</label>
+              <label className="block text-lg font-semibold mb-2">Flow: {flow}</label>
               <input
                 type="range"
                 min={0}
                 max={1}
                 step={0.01}
                 id="flow"
-                value={pendingFlow}
+                value={flow}
                 className="w-full"
                 onChange={async (e) => {
                   const newValue = e.target.value;
-                  setPendingFlow(newValue);
+                  setFlow(newValue);
                 }}
                 onMouseUp={handleSetFlow}
                 onTouchEnd={handleSetFlow} // for mobile support
               />
             </div>
             <div>
-              <label className="block text-lg font-semibold mb-2">Other: {pendingOther}</label>
+              <label className="block text-lg font-semibold mb-2">Other: {other}</label>
               <input
                 type="range"
                 min={0}
                 max={1}
                 step={0.01}
                 id="other"
-                value={pendingOther}
+                value={other}
                 className="w-full custom-gradient-range"
                 onChange={async (e) => {
                   const newValue = e.target.value;
-                  setPendingOther(newValue);
+                  setOther(newValue);
                 }}
                 onMouseUp={handleSetOther}
                 onTouchEnd={handleSetOther} // for mobile support
@@ -284,20 +289,21 @@ function ViewerHostRater() {
           <textarea
             className="border-4 border-solid border-black text-black p-2 w-2/3 resize-none"
             placeholder=""
-            value={textReviewPending}
+            value={textReview}
             rows={5}
             onChange={(e) => {
-              const newReviewTime = Date.now();
               if (e.target.value.length <= 500) {
-                setTextReviewPending(e.target.value);
-              } else {
-                return;
+                setTextReview(e.target.value);
               }
-              // Check if the time of the previous input was more than 1 second ago
-              lastReviewTime = newReviewTime;
-              if (newReviewTime - lastReviewTime > 2000) {
+              // Start a timer (if not already running) to handle text review submission
+              // The timer will stop once the review is submitted
+              if (window.textReviewTimer) {
+                clearTimeout(window.textReviewTimer);
+              }
+              window.textReviewTimer = setTimeout(() => {
                 handleTextReview();
-              }
+                window.textReviewTimer = null;
+              }, 2000);
             }}
           />
         </>
