@@ -1,7 +1,14 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
-import { SocketProvider, SocketContext, userState } from "./utils"; // Remove BACKEND import, not needed for images now
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+import { SocketProvider, SocketContext, userState } from "./utils";
 import { useContext, useEffect, useState } from "react";
 
 import ViewerLeaderboard from "./components/viewer_leaderboard";
@@ -12,18 +19,16 @@ import ViewerAnswer from "./components/viewer_answer";
 function ViewerApp() {
   const socket = useContext(SocketContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // 1. INITIALIZE STATE DIRECTLY FROM LOCALSTORAGE
-  // This ensures the color is there the instant the component mounts, before any effects run.
+  // State Initialization
   const [teamColor, setTeamColor] = useState<string>(
     () => localStorage.getItem("team_color") || ""
   );
-  const [username, setUsername] = useState<string>(() => localStorage.getItem("username") || "");
-
+  const [username] = useState<string>(() => localStorage.getItem("username") || "");
   const [overlayType, setOverlayType] = useState<string>("none");
 
   useEffect(() => {
-    // --- SOCKET LISTENERS ---
     const handleNewQuestion = (data: any) => {
       console.log("Global: New question received", data);
       navigate("/question", { state: { question: data } });
@@ -43,17 +48,12 @@ function ViewerApp() {
       const myUsername = localStorage.getItem("username");
       if (myUsername && teamMap[myUsername]) {
         const assignedColor = teamMap[myUsername];
-        console.log("Team Assigned via Socket:", assignedColor);
-
-        // Update State
         setTeamColor(assignedColor);
-        // Update Storage
         localStorage.setItem("team_color", assignedColor);
       }
     };
 
     const handleShowOverlay = (data: any) => {
-      console.log("Overlay Triggered:", data.type);
       setOverlayType(data.type);
     };
 
@@ -72,10 +72,8 @@ function ViewerApp() {
     };
   }, [socket, navigate]);
 
-  // --- IMAGE PATH LOGIC (LOCAL PUBLIC FOLDER) ---
-  // Ensure fbi.png and mafia.png are in the 'public' folder of your React project
+  // Image Path Logic
   let overlayImageSrc = "";
-
   if (overlayType === "reveal") {
     if (teamColor === "red") overlayImageSrc = "/mafia.png";
     else if (teamColor === "blue") overlayImageSrc = "/fbi.png";
@@ -85,35 +83,16 @@ function ViewerApp() {
     overlayImageSrc = "/mafia.png";
   }
 
+  // Page Check Logic
+  const isMainPage = location.pathname === "/" || location.pathname === "/viewer.html";
+
   const navBackgroundColor =
     teamColor === "red" ? "#FF0000" : teamColor === "blue" ? "#0051FF" : "white";
   const navTextColor = teamColor ? "white" : "black";
 
   return (
     <div style={{ minHeight: "100vh", position: "relative", boxSizing: "border-box" }}>
-      {/* --- OVERLAY IMAGE --- */}
-      {overlayImageSrc && (
-        <img
-          src={overlayImageSrc}
-          alt="Affiliation Overlay"
-          style={{
-            position: "fixed",
-            top: "70px", // Push down below header
-            right: "10px",
-            width: "100px",
-            height: "auto",
-            zIndex: 99999,
-            pointerEvents: "none",
-            filter: "drop-shadow(0px 4px 6px rgba(0,0,0,0.5))",
-          }}
-          onError={(e) => {
-            console.error("Failed to load image at path:", overlayImageSrc);
-            e.currentTarget.style.display = "none";
-          }}
-        />
-      )}
-
-      {/* --- HEADER --- */}
+      {/* Header Nav bar */}
       {username && (
         <nav
           style={{
@@ -128,11 +107,13 @@ function ViewerApp() {
             color: navTextColor,
             zIndex: 10000,
             padding: "10px 0",
+            // Ensure the nav is tall enough to fit the image nicely
+            minHeight: "50px",
             boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
             transition: "background-color 0.3s ease",
           }}
         >
-          {/* Leaderboard Button */}
+          {/* Leaderboard Button (Absolute Left) */}
           <button
             style={{
               position: "absolute",
@@ -150,11 +131,36 @@ function ViewerApp() {
             </Link>
           </button>
 
-          {/* Username */}
+          {/* Username (Centered by flex) */}
           <span style={{ fontWeight: "bold", fontSize: "1.4rem" }}>{username}</span>
+
+          {/* --- OVERLAY IMAGE (Absolute Right INSIDE Nav) --- */}
+          {isMainPage && overlayImageSrc && (
+            <img
+              src={overlayImageSrc}
+              alt="Affiliation Overlay"
+              style={{
+                position: "absolute",
+                right: "15px",
+                // Center vertically within the header
+                top: "50%",
+                transform: "translateY(-50%)",
+                // Sizing to fit header
+                maxHeight: "80%",
+                width: "auto",
+                maxWidth: "60px",
+                pointerEvents: "none",
+                filter: "drop-shadow(0px 1px 2px rgba(0,0,0,0.5))",
+              }}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          )}
         </nav>
       )}
 
+      {/* Main Content container with padding for fixed header */}
       <div style={{ paddingTop: username ? "70px" : "0px" }}>
         <Routes>
           <Route path="/" element={<ViewerLeaderboard />} />
