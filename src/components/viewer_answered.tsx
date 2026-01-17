@@ -1,50 +1,106 @@
-import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-// Loaded after a viewer answers; timer will be displayed on streamers end
-import { socket } from "../utils.tsx";
+import { useEffect, useState, useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { SocketContext } from "../utils";
 
 function ViewerAnswered() {
-  const navigate = useNavigate();
+  const socket = useContext(SocketContext);
   const location = useLocation();
-  const response = location.state?.response;
-  const question = location.state?.question;
+  const navigate = useNavigate();
 
-  React.useEffect(() => {
-    console.log("useEffect viewer_answered with results calls");
-    socket.on("results", () => {
-      navigate("/answer", {
-        state: {
-          correct:
-            question.question_type === "numbers"
-              ? Math.max(
-                  0,
-                  Math.floor(
-                    (1 -
-                      Math.abs(Number(question.answer) - Number(response)) /
-                        Number(question.answer)) *
-                      15 *
-                      Math.abs(question.weight)
-                  )
-                ) > 0
-              : question.answer.toLowerCase().split(",").includes(response.toLowerCase()),
-        },
-      });
-      // navigate(0);
-    });
+  const [localResponse, setLocalResponse] = useState("");
+  const [resultData, setResultData] = useState<any>(null);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+
+  // --- FIX 1: AUTH GUARD (Redirect to Login if no user) ---
+  useEffect(() => {
+    const user = localStorage.getItem("username");
+    if (!user) {
+      console.warn("No username found, redirecting to login...");
+      navigate("/"); // Redirects to ViewerLeaderboard which handles login
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    // Attempt to set from navigation state
+    if (location.state && location.state.response) {
+      setLocalResponse(location.state.response);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    const handleResults = (data: any) => {
+      console.log("Results payload:", data);
+      setResultData(data);
+
+      const myUsername = localStorage.getItem("username");
+      
+      // 1. FIND WHAT I ANSWERED
+      let myAnswer = "";
+      if (myUsername && data.responses && data.responses[myUsername]) {
+        myAnswer = data.responses[myUsername];
+      } else {
+        myAnswer = localResponse;
+      }
+
+      // 2. COMPARE WITH WINNER
+      if (myAnswer && data.answer) {
+        const cleanMyAnswer = myAnswer.trim();
+        const validAnswers = data.answer.split(",").map((a: string) => a.trim());
+
+        if (validAnswers.includes(cleanMyAnswer)) {
+          setIsCorrect(true);
+        } else {
+          setIsCorrect(false);
+        }
+      } else {
+        setIsCorrect(false);
+      }
+
+      // --- FIX 2: AUTO-REDIRECT TO LEADERBOARD ---
+      // Give them 5 seconds to celebrate/cry, then go back to scoreboard
+      setTimeout(() => {
+        navigate("/");
+      }, 5000);
+    };
+
+    const handleNewQuestion = (data: any) => {
+      navigate("/question", { state: { question: data } });
+    };
+
+    socket.on("results", handleResults);
+    socket.on("new_question", handleNewQuestion);
 
     return () => {
-      socket.off("results");
+      socket.off("results", handleResults);
+      socket.off("new_question", handleNewQuestion);
     };
-  }, [navigate, question, response]);
+  }, [socket, localResponse, navigate]);
 
   return (
-    <div
-      className="bg-gray-200 h-screen w-screen flex flex-col items-center justify-center"
-      key={location.key}
-      style={{ zIndex: 20000, position: "fixed", top: 0, left: 0 }}
-    >
-      <h1 className="text-black text-2xl font-bold mb-4">Good answer?</h1>
-      <div className="w-12 h-12 border-4 border-t-4 border-t-purple-500 border-purple-300 rounded-full mt-4 animate-spin"></div>
+    <div className="flex flex-col items-center justify-center h-screen w-screen bg-gray-100 p-4">
+      {resultData ? (
+        // --- SHOW RESULTS ---
+        <div 
+            className={`flex flex-col items-center justify-center w-full max-w-md aspect-square rounded-3xl shadow-2xl animate-bounce-in 
+            ${isCorrect ? "bg-green-500" : "bg-red-500"}`}
+        >
+          <h1 className="text-6xl font-black text-white drop-shadow-md tracking-wider">
+            {isCorrect ? "CORRECT" : "WRONG"}
+          </h1>
+        </div>
+      ) : (
+        // --- WAITING SCREEN ---
+        <div className="text-center p-10 bg-white rounded-2xl shadow-xl w-full max-w-sm">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600 mx-auto mb-6"></div>
+          <h2 className="text-3xl font-black text-gray-800 mb-2">LOCKED IN</h2>
+          <p className="text-2xl text-purple-600 font-bold italic mb-6">
+             Good answer?
+          </p>
+          <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">
+            Waiting for host...
+          </p>
+        </div>
+      )}
     </div>
   );
 }

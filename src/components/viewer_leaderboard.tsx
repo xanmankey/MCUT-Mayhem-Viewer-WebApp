@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { BACKEND } from "../utils.tsx";
 import { Player } from "../interfaces/Player.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -87,7 +87,7 @@ function ViewerLeaderboard() {
                 setWarning(errorData.message || response.statusText);
               }
             })
-            .catch((err) => {
+            .catch(() => {
               setWarning("Error sending data to backend");
             });
         }}
