@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
-import { SocketProvider, SocketContext, userState } from "./utils";
+import { SocketProvider, SocketContext, userState, BACKEND } from "./utils"; // Ensure BACKEND is imported
 import { useContext, useEffect, useState } from "react";
 
 import ViewerLeaderboard from "./components/viewer_leaderboard";
@@ -17,7 +17,14 @@ function ViewerApp() {
   const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
-    // ... (Global Listeners - No changes needed here) ...
+    // 1. Load User AND Team from LocalStorage immediately (Fixes the Refresh Reset)
+    const storedUser = localStorage.getItem("username");
+    const storedTeam = localStorage.getItem("team_color");
+
+    if (storedUser) setUsername(storedUser);
+    if (storedTeam) setTeamColor(storedTeam);
+
+    // --- SOCKET LISTENERS ---
     const handleNewQuestion = (data: any) => {
       console.log("Global: New question received", data);
       navigate("/question", { state: { question: data } });
@@ -36,7 +43,10 @@ function ViewerApp() {
     const handleTeamAssigned = (teamMap: any) => {
       const myUsername = localStorage.getItem("username");
       if (myUsername && teamMap[myUsername]) {
-        setTeamColor(teamMap[myUsername]);
+        const assignedColor = teamMap[myUsername];
+        setTeamColor(assignedColor);
+        // SAVE TO STORAGE so it survives a refresh!
+        localStorage.setItem("team_color", assignedColor);
       }
     };
 
@@ -59,20 +69,19 @@ function ViewerApp() {
     };
   }, [socket, navigate]);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("username");
-    if (storedUser) setUsername(storedUser);
-  }, []);
-
-  // --- FIX: PATHS UPDATED TO ROOT (For public/ folder) ---
+  // --- IMAGE PATH LOGIC (Using Absolute Backend URL) ---
+  // We use the BACKEND variable to ensure we are pointing to the Flask server
+  // regardless of where the React app is running.
   let overlayImageSrc = "";
+
+  // Note: Ensure your backend folder structure is: backend/static/images/fbi.png
   if (overlayType === "reveal") {
-    if (teamColor === "red") overlayImageSrc = "/static/images/mafia.png";
-    else if (teamColor === "blue") overlayImageSrc = "/static/images/fbi.png";
+    if (teamColor === "red") overlayImageSrc = `${BACKEND}/static/images/mafia.png`;
+    else if (teamColor === "blue") overlayImageSrc = `${BACKEND}/static/images/fbi.png`;
   } else if (overlayType === "fbi") {
-    overlayImageSrc = "/static/images/fbi.png";
+    overlayImageSrc = `${BACKEND}/static/images/fbi.png`;
   } else if (overlayType === "mafia") {
-    overlayImageSrc = "/static/images/mafia.png";
+    overlayImageSrc = `${BACKEND}/static/images/mafia.png`;
   }
 
   const navBackgroundColor =
@@ -81,7 +90,7 @@ function ViewerApp() {
 
   return (
     <div style={{ minHeight: "100vh", position: "relative", boxSizing: "border-box" }}>
-      {/* --- OVERLAY --- */}
+      {/* --- OVERLAY IMAGE --- */}
       {overlayImageSrc && (
         <img
           src={overlayImageSrc}
@@ -95,6 +104,11 @@ function ViewerApp() {
             zIndex: 99999,
             pointerEvents: "none",
             filter: "drop-shadow(-2px 2px 4px rgba(0,0,0,0.5))",
+          }}
+          onError={(e) => {
+            console.error("Failed to load image:", overlayImageSrc);
+            // Optional: fallback logic if needed
+            // e.currentTarget.style.display = 'none';
           }}
         />
       )}
