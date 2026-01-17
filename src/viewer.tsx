@@ -8,7 +8,6 @@ import ViewerLeaderboard from "./components/viewer_leaderboard";
 import ViewerQuestion from "./components/viewer_question";
 import ViewerAnswered from "./components/viewer_answered";
 import ViewerAnswer from "./components/viewer_answer";
-import ViewerHostRater from "./components/viewer_host_rater";
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Viewer loaded");
@@ -39,15 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
               Leaderboard
             </Link>
           </button>
-          <button style={{ margin: "0 10px", color: "black" }}>
-            <Link to="/hostrater" style={{ textDecoration: "none", color: "inherit" }}>
-              Host Rater
-            </Link>
-          </button>
         </nav>
         <Routes>
           <Route path="/" element={<ViewerLeaderboard />} />
-          <Route path="/hostrater" element={<ViewerHostRater />} />
           <Route path="/viewer.html" element={<ViewerLeaderboard />} />
           <Route path="/question" element={<ViewerQuestion />} />
           <Route path="/answered" element={<ViewerAnswered />} />
