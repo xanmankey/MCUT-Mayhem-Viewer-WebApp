@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
-import { SocketProvider, SocketContext, userState, BACKEND } from "./utils"; // Ensure BACKEND is imported
+import { SocketProvider, SocketContext, userState } from "./utils"; // Remove BACKEND import, not needed for images now
 import { useContext, useEffect, useState } from "react";
 
 import ViewerLeaderboard from "./components/viewer_leaderboard";
@@ -12,18 +12,17 @@ import ViewerAnswer from "./components/viewer_answer";
 function ViewerApp() {
   const socket = useContext(SocketContext);
   const navigate = useNavigate();
-  const [teamColor, setTeamColor] = useState<string>("");
+
+  // 1. INITIALIZE STATE DIRECTLY FROM LOCALSTORAGE
+  // This ensures the color is there the instant the component mounts, before any effects run.
+  const [teamColor, setTeamColor] = useState<string>(
+    () => localStorage.getItem("team_color") || ""
+  );
+  const [username, setUsername] = useState<string>(() => localStorage.getItem("username") || "");
+
   const [overlayType, setOverlayType] = useState<string>("none");
-  const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
-    // 1. Load User AND Team from LocalStorage immediately (Fixes the Refresh Reset)
-    const storedUser = localStorage.getItem("username");
-    const storedTeam = localStorage.getItem("team_color");
-
-    if (storedUser) setUsername(storedUser);
-    if (storedTeam) setTeamColor(storedTeam);
-
     // --- SOCKET LISTENERS ---
     const handleNewQuestion = (data: any) => {
       console.log("Global: New question received", data);
@@ -44,13 +43,17 @@ function ViewerApp() {
       const myUsername = localStorage.getItem("username");
       if (myUsername && teamMap[myUsername]) {
         const assignedColor = teamMap[myUsername];
+        console.log("Team Assigned via Socket:", assignedColor);
+
+        // Update State
         setTeamColor(assignedColor);
-        // SAVE TO STORAGE so it survives a refresh!
+        // Update Storage
         localStorage.setItem("team_color", assignedColor);
       }
     };
 
     const handleShowOverlay = (data: any) => {
+      console.log("Overlay Triggered:", data.type);
       setOverlayType(data.type);
     };
 
@@ -69,19 +72,17 @@ function ViewerApp() {
     };
   }, [socket, navigate]);
 
-  // --- IMAGE PATH LOGIC (Using Absolute Backend URL) ---
-  // We use the BACKEND variable to ensure we are pointing to the Flask server
-  // regardless of where the React app is running.
+  // --- IMAGE PATH LOGIC (LOCAL PUBLIC FOLDER) ---
+  // Ensure fbi.png and mafia.png are in the 'public' folder of your React project
   let overlayImageSrc = "";
 
-  // Note: Ensure your backend folder structure is: backend/static/images/fbi.png
   if (overlayType === "reveal") {
-    if (teamColor === "red") overlayImageSrc = `${BACKEND}/static/images/mafia.png`;
-    else if (teamColor === "blue") overlayImageSrc = `${BACKEND}/static/images/fbi.png`;
+    if (teamColor === "red") overlayImageSrc = "/mafia.png";
+    else if (teamColor === "blue") overlayImageSrc = "/fbi.png";
   } else if (overlayType === "fbi") {
-    overlayImageSrc = `${BACKEND}/static/images/fbi.png`;
+    overlayImageSrc = "/fbi.png";
   } else if (overlayType === "mafia") {
-    overlayImageSrc = `${BACKEND}/static/images/mafia.png`;
+    overlayImageSrc = "/mafia.png";
   }
 
   const navBackgroundColor =
@@ -97,18 +98,17 @@ function ViewerApp() {
           alt="Affiliation Overlay"
           style={{
             position: "fixed",
-            top: 0,
-            right: 0,
-            width: "120px",
+            top: "70px", // Push down below header
+            right: "10px",
+            width: "100px",
             height: "auto",
             zIndex: 99999,
             pointerEvents: "none",
-            filter: "drop-shadow(-2px 2px 4px rgba(0,0,0,0.5))",
+            filter: "drop-shadow(0px 4px 6px rgba(0,0,0,0.5))",
           }}
           onError={(e) => {
-            console.error("Failed to load image:", overlayImageSrc);
-            // Optional: fallback logic if needed
-            // e.currentTarget.style.display = 'none';
+            console.error("Failed to load image at path:", overlayImageSrc);
+            e.currentTarget.style.display = "none";
           }}
         />
       )}
