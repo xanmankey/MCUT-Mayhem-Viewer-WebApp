@@ -67,12 +67,12 @@ function ViewerApp() {
   // --- FIX: PATHS UPDATED TO ROOT (For public/ folder) ---
   let overlayImageSrc = "";
   if (overlayType === "reveal") {
-    if (teamColor === "red") overlayImageSrc = "/mafia.png"; // Changed from /static/images/
-    else if (teamColor === "blue") overlayImageSrc = "/fbi.png";
+    if (teamColor === "red") overlayImageSrc = "/static/images/mafia.png";
+    else if (teamColor === "blue") overlayImageSrc = "/static/images/fbi.png";
   } else if (overlayType === "fbi") {
-    overlayImageSrc = "/fbi.png";
+    overlayImageSrc = "/static/images/fbi.png";
   } else if (overlayType === "mafia") {
-    overlayImageSrc = "/mafia.png";
+    overlayImageSrc = "/static/images/mafia.png";
   }
 
   const navBackgroundColor =
