@@ -16,8 +16,8 @@ function ViewerApp() {
   const [overlayType, setOverlayType] = useState<string>("none");
   const [username, setUsername] = useState<string>("");
 
-  // --- GLOBAL EVENT LISTENERS ---
   useEffect(() => {
+    // ... (Keep existing Global Event Listeners) ...
     const handleNewQuestion = (data: any) => {
       console.log("Global: New question received", data);
       navigate("/question", { state: { question: data } });
@@ -25,13 +25,11 @@ function ViewerApp() {
 
     const handleCheckAnswered = () => {
       if (userState.username !== "") {
-        console.log("Global: Checking if user has answered");
         socket.emit("check_answered_response", { username: userState.username });
       }
     };
 
     const handleAlreadyAnswered = () => {
-      console.log("Global: User already answered");
       navigate("/answered", { state: { response: "", question: null } });
     };
 
@@ -61,12 +59,12 @@ function ViewerApp() {
     };
   }, [socket, navigate]);
 
-  // --- UI LOGIC ---
   useEffect(() => {
     const storedUser = localStorage.getItem("username");
     if (storedUser) setUsername(storedUser);
   }, []);
 
+  // --- UPDATED IMAGE PATHS (Using Flask Static Folder) ---
   let overlayImageSrc = "";
   if (overlayType === "reveal") {
     if (teamColor === "red") overlayImageSrc = "/static/images/mafia.png";
@@ -83,39 +81,30 @@ function ViewerApp() {
 
   return (
     <div style={{ minHeight: "100vh", position: "relative", boxSizing: "border-box" }}>
+      {/* --- UPDATED OVERLAY POSITION (Top Right) --- */}
       {overlayImageSrc && (
-        <div
+        <img
+          src={overlayImageSrc}
+          alt="Affiliation Overlay"
           style={{
             position: "fixed",
             top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            pointerEvents: "none",
+            right: 0,
+            width: "120px",
+            height: "auto",
             zIndex: 99999,
+            pointerEvents: "none", // Lets clicks pass through
+            filter: "drop-shadow(-2px 2px 4px rgba(0,0,0,0.5))",
           }}
-        >
-          <img
-            src={overlayImageSrc}
-            alt="Affiliation Overlay"
-            style={{
-              position: "absolute",
-              top: "60px",
-              right: "10px",
-              width: "100px",
-              height: "auto",
-              filter: "drop-shadow(0px 0px 5px rgba(0,0,0,0.5))",
-            }}
-          />
-        </div>
+        />
       )}
 
-      {/* Only show the Navbar if the user is logged in (has a username) */}
+      {/* --- UPDATED HEADER (Center Username) --- */}
       {username && (
         <nav
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center", // Center the username
             alignItems: "center",
             position: "fixed",
             top: 0,
@@ -124,29 +113,34 @@ function ViewerApp() {
             backgroundColor: navBackgroundColor,
             color: navTextColor,
             zIndex: 10000,
-            padding: "10px 20px",
+            padding: "10px 0",
             boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
             transition: "background-color 0.3s ease",
           }}
         >
+          {/* Leaderboard Button: Absolute Left */}
           <button
             style={{
+              position: "absolute",
+              left: "15px",
               color: navTextColor,
               border: `1px solid ${navTextColor}`,
               padding: "5px 10px",
               borderRadius: "5px",
               backgroundColor: "rgba(255,255,255,0.2)",
+              fontWeight: "bold",
             }}
           >
-            <Link to="/" style={{ textDecoration: "none", color: "inherit", fontWeight: "bold" }}>
+            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
               Leaderboard
             </Link>
           </button>
-          <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>{username}</span>
+
+          {/* Username: Centered (by flex container) */}
+          <span style={{ fontWeight: "bold", fontSize: "1.4rem" }}>{username}</span>
         </nav>
       )}
 
-      {/* Adjust padding based on whether nav is visible */}
       <div style={{ paddingTop: username ? "70px" : "0px" }}>
         <Routes>
           <Route path="/" element={<ViewerLeaderboard />} />
