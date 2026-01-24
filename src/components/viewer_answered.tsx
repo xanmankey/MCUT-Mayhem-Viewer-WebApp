@@ -26,7 +26,6 @@ function ViewerAnswered() {
 
   useEffect(() => {
     const handleResults = (data: any) => {
-      console.log("Results payload:", data);
       setResultData(data);
 
       const myUsername = localStorage.getItem("username");
@@ -38,16 +37,22 @@ function ViewerAnswered() {
       if (myAnswer && data.answer) {
         const cleanMyAnswer = myAnswer.trim();
         const validAnswers = data.answer.split(",").map((a: string) => a.trim());
+        const weight = data.weight || 1;
 
+        // --- MATCHING STREAMER LOGIC ---
         if (data.question_type === 4) {
-          // QuestionType.NUMBERS.value is 4
+          // QuestionType.NUMBERS
           const myNum = parseFloat(cleanMyAnswer);
 
-          // Check if any valid answer matches the number
-          const match: boolean = validAnswers.some((ans: string) => {
+          const match = validAnswers.some((ans: string) => {
             const targetNum: number = parseFloat(ans);
-            // Using 0 difference for "CORRECT" text, matching your backend logic
-            return !isNaN(myNum) && !isNaN(targetNum) && myNum === targetNum;
+            if (isNaN(myNum) || isNaN(targetNum) || targetNum === 0) return false;
+
+            const difference: number = Math.abs(targetNum - myNum);
+            // Replicating: Math.max(0, Math.floor((1 - difference / answer) * 15 * Math.abs(weight)))
+            // If the result of this formula is > 0, we consider it "Correct"
+            const score: number = Math.floor((1 - difference / targetNum) * 15 * Math.abs(weight));
+            return score > 0;
           });
 
           setIsCorrect(match);
