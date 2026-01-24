@@ -44,10 +44,12 @@ function ViewerAnswered() {
         const cleanMyAnswer = myAnswer.trim();
         const validAnswers = data.answer.split(",").map((a: string) => a.trim());
         const weight = data.weight || 1;
+        console.log("Question Type:", data.question_type);
 
         // --- NUMBERS LOGIC SYNCED WITH STREAMER ---
         // Check for both the enum index 4 and the string identifier
         if (data.question_type === 4 || data.question_type === "numbers") {
+          console.log("Evaluating number answer:", cleanMyAnswer, validAnswers);
           const myNum = parseFloat(cleanMyAnswer);
 
           const match = validAnswers.some((ans: string) => {
