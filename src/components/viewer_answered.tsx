@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { SocketContext } from "../utils";
 
@@ -11,120 +11,93 @@ function ViewerAnswered() {
   const [resultData, setResultData] = useState<any>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
-  // Auth Guard: Ensure the user is logged in
+  // Ref ensures the listener always sees the answer, even if state is mid-update
+  const responseRef = useRef("");
+
   useEffect(() => {
     const user = localStorage.getItem("username");
-    if (!user) {
-      console.warn("No username found, redirecting to login...");
-      navigate("/");
+    if (!user) navigate("/");
+
+    if (location.state?.response) {
+      const resp = String(location.state.response);
+      setLocalResponse(resp);
+      console.log(localResponse);
+      responseRef.current = resp;
     }
-  }, [navigate]);
+  }, [location, navigate]);
 
   useEffect(() => {
-    // Sync local state from navigation to show "Locked In" response
-    if (location.state && location.state.response) {
-      setLocalResponse(location.state.response);
-    }
-  }, [location]);
+    console.log("ViewerAnswered established - Listening for results...");
 
-  useEffect(() => {
     const handleResults = (data: any) => {
-      console.log("Results payload received:", data);
+      // THIS MUST PRINT IF THE PACKET HITS THE BROWSER
+      console.log("!!! Results payload received !!!", data);
       setResultData(data);
 
       const myUsername = localStorage.getItem("username");
-
-      // Source of Truth: Look up what the server officially recorded for this user
       let myAnswer =
-        myUsername && data.responses && data.responses[myUsername]
+        myUsername && data.responses?.[myUsername]
           ? data.responses[myUsername]
-          : localResponse;
+          : responseRef.current;
 
       if (myAnswer && data.answer) {
-        const cleanMyAnswer = myAnswer.trim();
-        const validAnswers = data.answer.split(",").map((a: string) => a.trim());
+        const cleanMyAnswer = String(myAnswer).trim();
+        const validAnswers = String(data.answer)
+          .split(",")
+          .map((a: string) => a.trim());
         const weight = data.weight || 1;
-        console.log("Question Type:", data.question_type);
 
-        // --- NUMBERS LOGIC SYNCED WITH STREAMER ---
-        // Check for both the enum index 4 and the string identifier
+        // FIX: Handle BOTH string and integer type identifiers
         if (data.question_type === 4 || data.question_type === "numbers") {
-          console.log("Evaluating number answer:", cleanMyAnswer, validAnswers);
           const myNum = parseFloat(cleanMyAnswer);
+          const targetNum = parseFloat(validAnswers[0]);
 
-          const match = validAnswers.some((ans: string) => {
-            const targetNum: number = parseFloat(ans);
-
-            // Basic sanity checks: ensure numbers are valid and prevent division by zero
-            if (isNaN(myNum) || isNaN(targetNum) || targetNum === 0) return false;
-
-            const difference: number = Math.abs(targetNum - myNum);
-
-            // 1. Calculate the accuracy ratio as a float
+          if (!isNaN(myNum) && !isNaN(targetNum) && targetNum !== 0) {
+            const difference = Math.abs(targetNum - myNum);
             const ratio = 1 - difference / targetNum;
 
-            // 2. Perform the score calculation matching app.py exactly
-            // We add 0.000001 (Epsilon) to handle floating point precision errors
-            // before flooring. This prevents 0.999999 from becoming 0.
-            const scoreCalculation = ratio * 15 * Math.abs(weight) + 0.000001;
+            // FIX: Add Epsilon (0.0001) to prevent precision errors
+            const scoreCalculation = ratio * 15 * Math.abs(weight) + 0.0001;
             const finalScore = Math.max(0, Math.floor(scoreCalculation));
 
-            console.log(
-              `User: ${myNum}, Target: ${targetNum}, Ratio: ${ratio}, Calc: ${scoreCalculation}, Final: ${finalScore}`
-            );
-
-            return finalScore > 0;
-          });
-
-          setIsCorrect(match);
+            console.log(`NUMBERS: User ${myNum}, Target ${targetNum}, Score ${finalScore}`);
+            setIsCorrect(finalScore > 0);
+          } else {
+            setIsCorrect(false);
+          }
         } else {
-          // Standard Exact Match for Multiple Choice/This or That/Dropdown
           setIsCorrect(validAnswers.includes(cleanMyAnswer));
         }
       } else {
         setIsCorrect(false);
       }
 
-      // Auto-redirect back to leaderboard after 5 seconds
-      setTimeout(() => {
-        navigate("/");
-      }, 5000);
-    };
-
-    const handleNewQuestion = (data: any) => {
-      navigate("/question", { state: { question: data } });
+      setTimeout(() => navigate("/"), 5000);
     };
 
     socket.on("results", handleResults);
-    socket.on("new_question", handleNewQuestion);
-
     return () => {
       socket.off("results", handleResults);
-      socket.off("new_question", handleNewQuestion);
     };
-  }, [socket, localResponse, navigate]);
+  }, [socket, navigate]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen w-screen bg-gray-100 p-4">
       {resultData ? (
-        // --- RESULT VIEW ---
         <div
-          className={`flex flex-col items-center justify-center w-full max-w-md aspect-square rounded-3xl shadow-2xl animate-bounce-in 
-            ${isCorrect ? "bg-green-500" : "bg-red-500"}`}
+          className={`flex flex-col items-center justify-center w-full max-w-md aspect-square rounded-3xl shadow-2xl animate-bounce-in ${
+            isCorrect ? "bg-green-500" : "bg-red-500"
+          }`}
         >
           <h1 className="text-6xl font-black text-white drop-shadow-md tracking-wider">
             {isCorrect ? "CORRECT" : "WRONG"}
           </h1>
         </div>
       ) : (
-        // --- WAITING VIEW ---
         <div className="text-center p-10 bg-white rounded-2xl shadow-xl w-full max-w-sm">
           <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600 mx-auto mb-6"></div>
           <h2 className="text-3xl font-black text-gray-800 mb-2">LOCKED IN</h2>
           <p className="text-2xl text-purple-600 font-bold italic mb-6">Good answer?</p>
-          <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">
-            Waiting for host...
-          </p>
         </div>
       )}
     </div>
