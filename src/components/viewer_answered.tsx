@@ -11,17 +11,14 @@ function ViewerAnswered() {
   const [resultData, setResultData] = useState<any>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
-  // --- FIX 1: AUTH GUARD (Redirect to Login if no user) ---
   useEffect(() => {
     const user = localStorage.getItem("username");
     if (!user) {
-      console.warn("No username found, redirecting to login...");
-      navigate("/"); // Redirects to ViewerLeaderboard which handles login
+      navigate("/");
     }
   }, [navigate]);
 
   useEffect(() => {
-    // Attempt to set from navigation state
     if (location.state && location.state.response) {
       setLocalResponse(location.state.response);
     }
@@ -33,31 +30,35 @@ function ViewerAnswered() {
       setResultData(data);
 
       const myUsername = localStorage.getItem("username");
+      let myAnswer =
+        myUsername && data.responses && data.responses[myUsername]
+          ? data.responses[myUsername]
+          : localResponse;
 
-      // 1. FIND WHAT I ANSWERED
-      let myAnswer = "";
-      if (myUsername && data.responses && data.responses[myUsername]) {
-        myAnswer = data.responses[myUsername];
-      } else {
-        myAnswer = localResponse;
-      }
-
-      // 2. COMPARE WITH WINNER
       if (myAnswer && data.answer) {
         const cleanMyAnswer = myAnswer.trim();
         const validAnswers = data.answer.split(",").map((a: string) => a.trim());
 
-        if (validAnswers.includes(cleanMyAnswer)) {
-          setIsCorrect(true);
+        if (data.question_type === 4) {
+          // QuestionType.NUMBERS.value is 4
+          const myNum = parseFloat(cleanMyAnswer);
+
+          // Check if any valid answer matches the number
+          const match: boolean = validAnswers.some((ans: string) => {
+            const targetNum: number = parseFloat(ans);
+            // Using 0 difference for "CORRECT" text, matching your backend logic
+            return !isNaN(myNum) && !isNaN(targetNum) && myNum === targetNum;
+          });
+
+          setIsCorrect(match);
         } else {
-          setIsCorrect(false);
+          // Standard exact string match for other types
+          setIsCorrect(validAnswers.includes(cleanMyAnswer));
         }
       } else {
         setIsCorrect(false);
       }
 
-      // --- FIX 2: AUTO-REDIRECT TO LEADERBOARD ---
-      // Give them 5 seconds to celebrate/cry, then go back to scoreboard
       setTimeout(() => {
         navigate("/");
       }, 5000);
@@ -79,7 +80,6 @@ function ViewerAnswered() {
   return (
     <div className="flex flex-col items-center justify-center h-screen w-screen bg-gray-100 p-4">
       {resultData ? (
-        // --- SHOW RESULTS ---
         <div
           className={`flex flex-col items-center justify-center w-full max-w-md aspect-square rounded-3xl shadow-2xl animate-bounce-in 
             ${isCorrect ? "bg-green-500" : "bg-red-500"}`}
@@ -89,7 +89,6 @@ function ViewerAnswered() {
           </h1>
         </div>
       ) : (
-        // --- WAITING SCREEN ---
         <div className="text-center p-10 bg-white rounded-2xl shadow-xl w-full max-w-sm">
           <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600 mx-auto mb-6"></div>
           <h2 className="text-3xl font-black text-gray-800 mb-2">LOCKED IN</h2>
