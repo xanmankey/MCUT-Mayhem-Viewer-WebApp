@@ -12,36 +12,92 @@ function ViewerFinale() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Grab the questions passed from the router state
   const initialQuestions = location.state?.questions || [];
   const [availableQuestions, setAvailableQuestions] = useState<any[]>(initialQuestions);
-  const [expandedQuestionId, setExpandedQuestionId] = useState<number | null>(null);
 
-  // Fallback if accessed without state
+  // --- NEW: Track the entire active question object instead of just the ID ---
+  const [activeQuestion, setActiveQuestion] = useState<any | null>(null);
+
   useEffect(() => {
     if (initialQuestions.length === 0) {
       navigate("/");
     }
   }, [initialQuestions, navigate]);
 
-  // The overridden submit function
   const handleFinaleSubmit = (response: string, questionNumber: number) => {
     console.log(`Submitting finale answer for Q${questionNumber}:`, response);
 
-    // 1. Send the answer asynchronously
     socket.emit("submit_finale_answer", {
       username: userState.username,
       number: questionNumber,
       response: response,
     });
 
-    // 2. Remove the question from the local list so they can't answer again
+    // Remove from the list AND exit the full-screen view
     setAvailableQuestions((prev) => prev.filter((q) => q.number !== questionNumber));
-
-    // 3. Close the expanded view
-    setExpandedQuestionId(null);
+    setActiveQuestion(null);
   };
 
+  // ==========================================
+  // VIEW 1: THE FULL-SCREEN ACTIVE QUESTION
+  // ==========================================
+  if (activeQuestion) {
+    return (
+      <div
+        className="flex flex-col h-screen w-screen bg-gray-100 absolute top-0 left-0"
+        style={{ zIndex: 99999 }} // Ensures it sits on top of everything, including the nav bar
+      >
+        {/* Top Header Bar */}
+        <div className="bg-white shadow-md p-4 flex items-center justify-between z-10 w-full">
+          <button
+            onClick={() => setActiveQuestion(null)}
+            className="text-purple-600 font-bold px-4 py-2 rounded-lg bg-purple-100 hover:bg-purple-200 active:bg-purple-300 transition-colors"
+          >
+            ← Back
+          </button>
+          <span className="font-bold text-gray-700 truncate ml-4 flex-1 text-right">
+            Question {activeQuestion.number}
+          </span>
+        </div>
+
+        {/* The Question Container (Takes up the rest of the screen) */}
+        <div className="flex-1 overflow-y-auto relative bg-white">
+          {/* Notice there are no scale/shrink CSS hacks here anymore! */}
+          {activeQuestion.question_type === "multiple_choice" ||
+          activeQuestion.question_type === "this_or_that" ? (
+            <MultipleChoiceQuestion
+              question={activeQuestion}
+              sendResponse={(res: string) => handleFinaleSubmit(res, activeQuestion.number)}
+            />
+          ) : activeQuestion.question_type === "short_answer" ||
+            activeQuestion.question_type === "ranked_answer" ? (
+            <ShortAnswerQuestion
+              question={activeQuestion}
+              sendResponse={(res: string) => handleFinaleSubmit(res, activeQuestion.number)}
+            />
+          ) : activeQuestion.question_type === "numbers" ? (
+            <NumberQuestion
+              question={activeQuestion}
+              sendResponse={(res: string) => handleFinaleSubmit(res, activeQuestion.number)}
+            />
+          ) : activeQuestion.question_type === "dropdown" ? (
+            <DropdownQuestion
+              question={activeQuestion}
+              sendResponse={(res: string) => handleFinaleSubmit(res, activeQuestion.number)}
+            />
+          ) : (
+            <div className="flex justify-center items-center h-full text-red-500 font-bold text-xl p-4 text-center">
+              Unsupported format: {activeQuestion.question_type}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // VIEW 2: THE MAIN QUESTION LIST
+  // ==========================================
   return (
     <div className="flex flex-col items-center h-screen w-screen bg-gray-100 overflow-y-auto pb-20 pt-4 px-4">
       <h2 className="text-2xl font-black text-gray-800 mb-6 text-center">
@@ -64,52 +120,14 @@ function ViewerFinale() {
           availableQuestions.map((q) => (
             <div
               key={q.number}
-              className={`bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 border-2 ${
-                expandedQuestionId === q.number ? "border-purple-500" : "border-gray-200"
-              }`}
+              // Added active/hover states to make it feel like a clickable button
+              className="bg-white rounded-xl shadow-md border border-gray-200 cursor-pointer hover:border-purple-500 hover:shadow-lg active:scale-95 transition-all duration-200"
+              onClick={() => setActiveQuestion(q)}
             >
-              {/* Card Header (Click to expand) */}
-              <div
-                className="p-4 cursor-pointer flex justify-between items-center hover:bg-gray-50"
-                onClick={() =>
-                  setExpandedQuestionId(expandedQuestionId === q.number ? null : q.number)
-                }
-              >
-                <span className="font-bold text-gray-700 truncate pr-4">{q.question}</span>
-                <span className="text-2xl text-purple-600">
-                  {expandedQuestionId === q.number ? "−" : "+"}
-                </span>
+              <div className="p-5 flex justify-between items-center">
+                <span className="font-bold text-gray-700 text-lg">{q.question}</span>
+                <span className="text-purple-600 font-black text-2xl pl-4">→</span>
               </div>
-
-              {/* Card Body (The Question Component) */}
-              {expandedQuestionId === q.number && (
-                <div className="p-4 border-t border-gray-100 bg-gray-50 relative z-10">
-                  {/* Re-using existing components, but injecting the new finale submit handler */}
-                  {q.question_type === "multiple_choice" || q.question_type === "this_or_that" ? (
-                    <MultipleChoiceQuestion
-                      question={q}
-                      sendResponse={(res: string) => handleFinaleSubmit(res, q.number)}
-                    />
-                  ) : q.question_type === "short_answer" || q.question_type === "ranked_answer" ? (
-                    <ShortAnswerQuestion
-                      question={q}
-                      sendResponse={(res: string) => handleFinaleSubmit(res, q.number)}
-                    />
-                  ) : q.question_type === "numbers" ? (
-                    <NumberQuestion
-                      question={q}
-                      sendResponse={(res: string) => handleFinaleSubmit(res, q.number)}
-                    />
-                  ) : q.question_type === "dropdown" ? (
-                    <DropdownQuestion
-                      question={q}
-                      sendResponse={(res: string) => handleFinaleSubmit(res, q.number)}
-                    />
-                  ) : (
-                    <p className="text-red-500">Unsupported format.</p>
-                  )}
-                </div>
-              )}
             </div>
           ))
         )}
