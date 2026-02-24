@@ -75,21 +75,24 @@ function ViewerLeaderboard() {
           fetch(BACKEND + "/create_player", {
             method: "POST",
             body: formData,
-          })
-            .then(async (response) => {
-              if (response.ok) {
-                console.log("User account created successfully");
-                setUsername(username);
-                // Refresh to trigger the App-level check_answered logic
-                navigate(0);
-              } else {
-                const errorData = await response.json();
-                setWarning(errorData.message || response.statusText);
+          }).then(async (response) => {
+            if (response.ok) {
+              // --- NEW: Read the response data and save the team locally ---
+              const data = await response.json();
+              console.log("User account created successfully");
+              setUsername(username);
+
+              if (data.team) {
+                localStorage.setItem("team_color", data.team);
               }
-            })
-            .catch(() => {
-              setWarning("Error sending data to backend");
-            });
+
+              // Refresh to trigger the App-level check_answered logic
+              navigate(0);
+            } else {
+              const errorData = await response.json();
+              setWarning(errorData.message || response.statusText);
+            }
+          });
         }}
         className="w-64"
       >
