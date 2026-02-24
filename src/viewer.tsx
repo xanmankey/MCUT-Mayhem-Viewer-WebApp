@@ -15,6 +15,7 @@ import ViewerLeaderboard from "./components/viewer_leaderboard";
 import ViewerQuestion from "./components/viewer_question";
 import ViewerAnswered from "./components/viewer_answered";
 import ViewerAnswer from "./components/viewer_answer";
+import ViewerFinale from "./components/viewer_finale";
 
 function ViewerApp() {
   const socket = useContext(SocketContext);
@@ -57,6 +58,11 @@ function ViewerApp() {
       setOverlayType(data.type);
     };
 
+    const handleFinaleStarted = (data: any) => {
+      navigate("/finale", { state: { questions: data.questions } });
+    };
+
+    socket.on("finale_started", handleFinaleStarted);
     socket.on("new_question", handleNewQuestion);
     socket.on("check_answered", handleCheckAnswered);
     socket.on("already_answered", handleAlreadyAnswered);
@@ -69,6 +75,7 @@ function ViewerApp() {
       socket.off("already_answered", handleAlreadyAnswered);
       socket.off("team_assigned", handleTeamAssigned);
       socket.off("show_overlay", handleShowOverlay);
+      socket.off("finale_started", handleFinaleStarted);
     };
   }, [socket, navigate]);
 
@@ -168,6 +175,7 @@ function ViewerApp() {
           <Route path="/question" element={<ViewerQuestion />} />
           <Route path="/answered" element={<ViewerAnswered />} />
           <Route path="/answer" element={<ViewerAnswer />} />
+          <Route path="/finale" element={<ViewerFinale />} />
         </Routes>
       </div>
     </div>
