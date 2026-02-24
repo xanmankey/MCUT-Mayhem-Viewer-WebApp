@@ -27,7 +27,9 @@ function ViewerApp() {
     () => localStorage.getItem("team_color") || ""
   );
   const [username] = useState<string>(() => localStorage.getItem("username") || "");
-  const [overlayType, setOverlayType] = useState<string>("none");
+  const [overlayType, setOverlayType] = useState<string>(
+    () => localStorage.getItem("overlay_type") || "none"
+  );
 
   useEffect(() => {
     const handleNewQuestion = (data: any) => {
@@ -56,6 +58,8 @@ function ViewerApp() {
 
     const handleShowOverlay = (data: any) => {
       setOverlayType(data.type);
+      // Keep local storage updated in case they refresh
+      localStorage.setItem("overlay_type", data.type);
     };
 
     const handleFinaleStarted = (data: any) => {

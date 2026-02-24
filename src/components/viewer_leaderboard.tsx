@@ -77,7 +77,6 @@ function ViewerLeaderboard() {
             body: formData,
           }).then(async (response) => {
             if (response.ok) {
-              // --- NEW: Read the response data and save the team locally ---
               const data = await response.json();
               console.log("User account created successfully");
               setUsername(username);
@@ -86,7 +85,11 @@ function ViewerLeaderboard() {
                 localStorage.setItem("team_color", data.team);
               }
 
-              // Refresh to trigger the App-level check_answered logic
+              // --- NEW: Save the overlay state before reloading ---
+              if (data.overlay) {
+                localStorage.setItem("overlay_type", data.overlay);
+              }
+
               navigate(0);
             } else {
               const errorData = await response.json();
