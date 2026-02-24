@@ -19,18 +19,34 @@ function ViewerFinale() {
   const [activeQuestion, setActiveQuestion] = useState<any | null>(null);
   const [finaleEnded, setFinaleEnded] = useState(false);
 
+  const GOAL_SCORE = 1000;
+
   useEffect(() => {
     if (initialQuestions.length === 0) {
       navigate("/");
     }
 
-    socket.on("finale_ended", () => {
+    // Listener 1: The official kill switch
+    const handleFinaleEnded = () => {
       setFinaleEnded(true);
-      setActiveQuestion(null); // Force close any open question
-    });
+      setActiveQuestion(null);
+    };
+
+    // Listener 2: The Bulletproof Fallback
+    // If the phone ever sees a score >= 1000, it kills the game itself
+    const handleScoreUpdate = (data: { red: number; blue: number }) => {
+      if (data.red >= GOAL_SCORE || data.blue >= GOAL_SCORE) {
+        setFinaleEnded(true);
+        setActiveQuestion(null);
+      }
+    };
+
+    socket.on("finale_ended", handleFinaleEnded);
+    socket.on("team_score_update", handleScoreUpdate);
 
     return () => {
-      socket.off("finale_ended");
+      socket.off("finale_ended", handleFinaleEnded);
+      socket.off("team_score_update", handleScoreUpdate);
     };
   }, [initialQuestions, navigate, socket]);
 
