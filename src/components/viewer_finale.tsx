@@ -17,12 +17,40 @@ function ViewerFinale() {
 
   // --- NEW: Track the entire active question object instead of just the ID ---
   const [activeQuestion, setActiveQuestion] = useState<any | null>(null);
+  const [finaleEnded, setFinaleEnded] = useState(false);
 
   useEffect(() => {
     if (initialQuestions.length === 0) {
       navigate("/");
     }
-  }, [initialQuestions, navigate]);
+
+    socket.on("finale_ended", () => {
+      setFinaleEnded(true);
+      setActiveQuestion(null); // Force close any open question
+    });
+
+    return () => {
+      socket.off("finale_ended");
+    };
+  }, [initialQuestions, navigate, socket]);
+
+  if (finaleEnded) {
+    return (
+      <div
+        className="flex flex-col items-center justify-center h-screen w-screen bg-gray-900 px-6 text-center"
+        style={{ zIndex: 999999 }}
+      >
+        <h1 className="text-5xl font-black text-white mb-6 animate-pulse uppercase tracking-widest">
+          SYSTEM OVERRIDE
+          <br />
+          COMPLETE
+        </h1>
+        <p className="text-2xl text-gray-300 font-medium border-t-2 border-gray-600 pt-6">
+          The war is over - time for the results
+        </p>
+      </div>
+    );
+  }
 
   const handleFinaleSubmit = (response: string, questionNumber: number) => {
     console.log(`Submitting finale answer for Q${questionNumber}:`, response);
