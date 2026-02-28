@@ -66,7 +66,8 @@ function ViewerAnswered() {
             setIsCorrect(false);
           }
         } else {
-          setIsCorrect(validAnswers.includes(cleanMyAnswer));
+          const lowerValidAnswers = validAnswers.map((a: string) => a.toLowerCase());
+          setIsCorrect(lowerValidAnswers.includes(cleanMyAnswer.toLowerCase()));
         }
       } else {
         setIsCorrect(false);
