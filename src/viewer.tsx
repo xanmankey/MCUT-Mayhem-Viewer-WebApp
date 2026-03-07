@@ -38,8 +38,9 @@ function ViewerApp() {
     };
 
     const handleCheckAnswered = () => {
-      if (userState.username !== "") {
-        socket.emit("check_answered_response", { username: userState.username });
+      const currentName = userState.username || localStorage.getItem("username");
+      if (currentName) {
+        socket.emit("check_answered_response", { username: currentName });
       }
     };
 
